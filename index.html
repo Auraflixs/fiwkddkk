@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chily Frutas - Sistema Administrativo</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-icon">
+          <i class="fas fa-leaf"></i>
+          <i class="fas fa-pepper-hot logo-chili"></i>
+        </div>
+        <h1>Chily Frutas</h1>
+        <p>Sistema Administrativo v1.0</p>
+      </div>
+      <form id="loginForm" class="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label><i class="fas fa-user"></i> Usuario</label>
+          <input type="text" id="loginUser" placeholder="Ingrese su usuario" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Contraseña</label>
+          <div class="password-field">
+            <input type="password" id="loginPass" placeholder="Ingrese su contraseña" />
+            <button type="button" class="toggle-pass" onclick="togglePassword()">
+              <i class="fas fa-eye" id="eyeIcon"></i>
+            </button>
+          </div>
+        </div>
+        <div id="loginError" class="login-error hidden">
+          <i class="fas fa-exclamation-circle"></i> Usuario o contraseña incorrectos
+        </div>
+        <button type="submit" class="btn-login">
+          <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        </button>
+        <div class="login-hint">
+          <small><b>Admin:</b> admin / 1234 &nbsp;|&nbsp; <b>Cajero:</b> cajero / 1234</small>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MAIN APP ===== -->
+  <div id="appScreen" class="app-screen hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon-sm">
+            <i class="fas fa-leaf"></i>
+          </div>
+          <div class="sidebar-brand">
+            <span class="brand-name">Chily Frutas</span>
+            <span class="brand-sub">Sistema Admin</span>
+          </div>
+        </div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-info">
+          <span id="sidebarUserName">Admin</span>
+          <span id="sidebarUserRole" class="user-role">Administrador</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Principal</div>
+        <a href="#" class="nav-item active" onclick="navigateTo('dashboard', this)">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#" class="nav-item" onclick="navigateTo('ventas', this)">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Ventas</span>
+          <span class="nav-badge" id="cartBadge">0</span>
+        </a>
+        <a href="#" class="nav-item" onclick="navigateTo('menu', this)">
+          <i class="fas fa-utensils"></i>
+          <span>Menú de Productos</span>
+        </a>
+
+        <div class="nav-section-label">Gestión</div>
+        <a href="#" class="nav-item" onclick="navigateTo('inventario', this)">
+          <i class="fas fa-boxes"></i>
+          <span>Inventario</span>
+        </a>
+        <a href="#" class="nav-item" onclick="navigateTo('ingredientes', this)">
+          <i class="fas fa-seedling"></i>
+          <span>Ingredientes</span>
+        </a>
+        <a href="#" class="nav-item" onclick="navigateTo('clientes', this)">
+          <i class="fas fa-users"></i>
+          <span>Clientes</span>
+        </a>
+        <a href="#" class="nav-item" onclick="navigateTo('reportes', this)">
+          <i class="fas fa-chart-bar"></i>
+          <span>Reportes</span>
+        </a>
+
+        <div class="nav-section-label admin-only">Administración</div>
+        <a href="#" class="nav-item admin-only" onclick="navigateTo('usuarios', this)">
+          <i class="fas fa-user-cog"></i>
+          <span>Usuarios</span>
+        </a>
+        <a href="#" class="nav-item" onclick="navigateTo('configuracion', this)">
+          <i class="fas fa-cog"></i>
+          <span>Configuración</span>
+        </a>
+
+        <div class="nav-section-label">Soporte</div>
+        <a href="#" class="nav-item" onclick="navigateTo('ayuda', this)">
+          <i class="fas fa-question-circle"></i>
+          <span>Ayuda</span>
+        </a>
+        <a href="#" class="nav-item" onclick="navigateTo('acerca', this)">
+          <i class="fas fa-info-circle"></i>
+          <span>Acerca del Sistema</span>
+        </a>
+        <a href="#" class="nav-item nav-logout" onclick="handleLogout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Cerrar Sesión</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="mainContent">
+
+      <!-- HEADER -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="header-menu-btn" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="breadcrumb">
+            <i class="fas fa-home"></i>
+            <span id="breadcrumbText">Dashboard</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="header-time">
+            <i class="fas fa-clock"></i>
+            <span id="headerTime">00:00:00</span>
+          </div>
+          <div class="header-date">
+            <i class="fas fa-calendar"></i>
+            <span id="headerDate"></span>
+          </div>
+          <div class="header-notif" onclick="toggleNotifications()">
+            <i class="fas fa-bell"></i>
+            <span class="notif-badge" id="notifBadge">3</span>
+            <div class="notif-dropdown hidden" id="notifDropdown">
+              <div class="notif-header">Notificaciones</div>
+              <div class="notif-item warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                  <b>Stock Bajo</b>
+                  <small>Fresa: 2 kg restantes</small>
+                </div>
+              </div>
+              <div class="notif-item warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                  <b>Stock Bajo</b>
+                  <small>Hielo: 1 kg restante</small>
+                </div>
+              </div>
+              <div class="notif-item info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                  <b>Nueva Venta</b>
+                  <small>Venta #0045 registrada</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="header-user" onclick="toggleUserMenu()">
+            <i class="fas fa-user-circle"></i>
+            <span id="headerUserName">Admin</span>
+            <i class="fas fa-chevron-down"></i>
+            <div class="user-dropdown hidden" id="userDropdown">
+              <a href="#" onclick="navigateTo('configuracion', null)"><i class="fas fa-cog"></i> Configuración</a>
+              <a href="#" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- PAGES -->
+      <div class="pages-container">
+
+        <!-- ===== DASHBOARD ===== -->
+        <section id="page-dashboard" class="page active">
+          <div class="page-header">
+            <div>
+              <h2 id="welcomeMsg">Bienvenido, Admin</h2>
+              <p class="page-subtitle" id="dashboardDate">Hoy es ...</p>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card green">
+              <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+              <div class="stat-info">
+                <span class="stat-label">Ventas del Día</span>
+                <span class="stat-value" id="statVentasDia">C$ 0.00</span>
+                <span class="stat-change positive"><i class="fas fa-arrow-up"></i> 12% vs ayer</span>
+              </div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
+              <div class="stat-info">
+                <span class="stat-label">Ventas Semanales</span>
+                <span class="stat-value" id="statVentasSemana">C$ 0.00</span>
+                <span class="stat-change positive"><i class="fas fa-arrow-up"></i> 8% vs semana pasada</span>
+              </div>
+            </div>
+            <div class="stat-card blue">
+              <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+              <div class="stat-info">
+                <span class="stat-label">Ventas Mensuales</span>
+                <span class="stat-value" id="statVentasMes">C$ 0.00</span>
+                <span class="stat-change positive"><i class="fas fa-arrow-up"></i> 15% vs mes pasado</span>
+              </div>
+            </div>
+            <div class="stat-card purple">
+              <div class="stat-icon"><i class="fas fa-coins"></i></div>
+              <div class="stat-info">
+                <span class="stat-label">Ganancias</span>
+                <span class="stat-value" id="statGanancias">C$ 0.00</span>
+                <span class="stat-change positive"><i class="fas fa-arrow-up"></i> 10% este mes</span>
+              </div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-icon"><i class="fas fa-box"></i></div>
+              <div class="stat-info">
+                <span class="stat-label">Productos Registrados</span>
+                <span class="stat-value" id="statProductos">0</span>
+                <span class="stat-change neutral"><i class="fas fa-minus"></i> Sin cambios</span>
+              </div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+              <div class="stat-info">
+                <span class="stat-label">Inventario Bajo</span>
+                <span class="stat-value" id="statInventarioBajo">0</span>
+                <span class="stat-change negative"><i class="fas fa-arrow-down"></i> Requiere atención</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="dash-card chart-card">
+              <div class="card-header">
+                <h3><i class="fas fa-chart-line"></i> Ventas de la Semana</h3>
+              </div>
+              <div class="chart-container">
+                <canvas id="ventasChart" width="500" height="220"></canvas>
+              </div>
+            </div>
+            <div class="dash-card chart-card">
+              <div class="card-header">
+                <h3><i class="fas fa-chart-pie"></i> Productos Más Vendidos</h3>
+              </div>
+              <div class="chart-container">
+                <canvas id="productosChart" width="300" height="220"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card full-card">
+            <div class="card-header">
+              <h3><i class="fas fa-history"></i> Últimas Ventas</h3>
+              <button class="btn-sm btn-outline" onclick="navigateTo('ventas', null)">Ver Todas</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th># Factura</th>
+                  <th>Cliente</th>
+                  <th>Cajero</th>
+                  <th>Productos</th>
+                  <th>Total</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="ultimasVentasTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== VENTAS ===== -->
+        <section id="page-ventas" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-shopping-cart"></i> Módulo de Ventas</h2>
+          </div>
+          <div class="ventas-layout">
+            <!-- Panel izquierdo: buscar y agregar -->
+            <div class="ventas-left">
+              <div class="dash-card">
+                <div class="card-header">
+                  <h3><i class="fas fa-search"></i> Buscar Producto</h3>
+                </div>
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="ventasSearch" placeholder="Buscar producto por nombre..." oninput="buscarProductosVenta()" />
+                </div>
+                <div class="productos-venta-grid" id="productosVentaGrid"></div>
+              </div>
+            </div>
+            <!-- Panel derecho: carrito -->
+            <div class="ventas-right">
+              <div class="dash-card carrito-card">
+                <div class="card-header">
+                  <h3><i class="fas fa-shopping-basket"></i> Carrito de Venta</h3>
+                  <button class="btn-sm btn-danger" onclick="limpiarCarrito()">
+                    <i class="fas fa-trash"></i> Limpiar
+                  </button>
+                </div>
+
+                <div class="cliente-selector">
+                  <label><i class="fas fa-user"></i> Cliente</label>
+                  <select id="ventaCliente">
+                    <option value="consumidor">Consumidor Final</option>
+                  </select>
+                </div>
+
+                <div class="carrito-items" id="carritoItems">
+                  <div class="carrito-empty">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>El carrito está vacío</p>
+                    <small>Busca y agrega productos</small>
+                  </div>
+                </div>
+
+                <div class="carrito-totals">
+                  <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">C$ 0.00</span>
+                  </div>
+                  <div class="total-row total-final">
+                    <span>TOTAL:</span>
+                    <span id="totalVenta">C$ 0.00</span>
+                  </div>
+                </div>
+
+                <div class="pago-section">
+                  <h4><i class="fas fa-money-bill-wave"></i> Método de Pago</h4>
+                  <div class="pago-metodo">
+                    <label class="radio-label active">
+                      <input type="radio" name="pago" value="efectivo" checked /> Efectivo
+                    </label>
+                  </div>
+                  <div class="pago-inputs">
+                    <div class="form-group">
+                      <label>Dinero Recibido (C$)</label>
+                      <input type="number" id="montoRecibido" placeholder="0.00" oninput="calcularCambio()" min="0" />
+                    </div>
+                    <div class="cambio-display">
+                      <span>Cambio:</span>
+                      <span id="cambioDisplay" class="cambio-value">C$ 0.00</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="carrito-btns">
+                  <button class="btn-primary" onclick="finalizarVenta()">
+                    <i class="fas fa-check-circle"></i> Finalizar Venta
+                  </button>
+                  <button class="btn-outline" onclick="generarFacturaVenta()">
+                    <i class="fas fa-file-invoice"></i> Generar Factura
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Historial de ventas -->
+          <div class="dash-card mt-20">
+            <div class="card-header">
+              <h3><i class="fas fa-list"></i> Historial de Ventas</h3>
+              <div class="header-actions">
+                <input type="text" class="search-inline" placeholder="Buscar venta..." oninput="filtrarHistorialVentas(this.value)" />
+              </div>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th># Factura</th>
+                  <th>Cliente</th>
+                  <th>Cajero</th>
+                  <th>Total</th>
+                  <th>Recibido</th>
+                  <th>Cambio</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="historialVentasTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== MENÚ DE PRODUCTOS ===== -->
+        <section id="page-menu" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-utensils"></i> Menú de Productos</h2>
+            <div class="page-actions">
+              <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filtrarMenu('todos', this)">Todos</button>
+                <button class="filter-tab" onclick="filtrarMenu('Batido', this)">Batidos</button>
+                <button class="filter-tab" onclick="filtrarMenu('Ensalada', this)">Ensaladas</button>
+                <button class="filter-tab" onclick="filtrarMenu('Fresco', this)">Frescos</button>
+                <button class="filter-tab" onclick="filtrarMenu('Postre', this)">Postres</button>
+                <button class="filter-tab" onclick="filtrarMenu('Fruta', this)">Frutas</button>
+              </div>
+            </div>
+          </div>
+          <div class="menu-grid" id="menuGrid"></div>
+        </section>
+
+        <!-- ===== INVENTARIO ===== -->
+        <section id="page-inventario" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-boxes"></i> Inventario</h2>
+            <div class="page-actions">
+              <div class="search-box-sm">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar producto..." oninput="filtrarInventario(this.value)" />
+              </div>
+              <button class="btn-primary" onclick="abrirModalInventario()">
+                <i class="fas fa-plus"></i> Agregar Producto
+              </button>
+            </div>
+          </div>
+
+          <div class="alerts-row" id="inventarioAlertas"></div>
+
+          <div class="dash-card">
+            <table class="data-table" id="inventarioTable">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nombre</th>
+                  <th>Categoría</th>
+                  <th>Precio</th>
+                  <th>Cantidad</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="inventarioBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== INGREDIENTES ===== -->
+        <section id="page-ingredientes" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-seedling"></i> Ingredientes</h2>
+            <div class="page-actions">
+              <div class="search-box-sm">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar ingrediente..." oninput="filtrarIngredientes(this.value)" />
+              </div>
+              <button class="btn-primary" onclick="abrirModalIngrediente()">
+                <i class="fas fa-plus"></i> Agregar Ingrediente
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-mini-grid">
+            <div class="mini-stat green">
+              <i class="fas fa-seedling"></i>
+              <div>
+                <span id="totalIngredientes">0</span>
+                <small>Total Ingredientes</small>
+              </div>
+            </div>
+            <div class="mini-stat orange">
+              <i class="fas fa-exclamation-triangle"></i>
+              <div>
+                <span id="ingredientesBajos">0</span>
+                <small>Stock Bajo</small>
+              </div>
+            </div>
+            <div class="mini-stat red">
+              <i class="fas fa-times-circle"></i>
+              <div>
+                <span id="ingredientesAgotados">0</span>
+                <small>Agotados</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Ingrediente</th>
+                  <th>Unidad</th>
+                  <th>Stock</th>
+                  <th>Mínimo</th>
+                  <th>Costo/Unidad</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="ingredientesBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== CLIENTES ===== -->
+        <section id="page-clientes" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-users"></i> Clientes</h2>
+            <div class="page-actions">
+              <div class="search-box-sm">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar cliente..." oninput="filtrarClientes(this.value)" />
+              </div>
+              <button class="btn-primary" onclick="abrirModalCliente()">
+                <i class="fas fa-user-plus"></i> Agregar Cliente
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-mini-grid">
+            <div class="mini-stat green">
+              <i class="fas fa-users"></i>
+              <div>
+                <span id="totalClientes">0</span>
+                <small>Total Clientes</small>
+              </div>
+            </div>
+            <div class="mini-stat orange">
+              <i class="fas fa-star"></i>
+              <div>
+                <span id="clientesFrecuentes">0</span>
+                <small>Clientes Frecuentes</small>
+              </div>
+            </div>
+            <div class="mini-stat blue">
+              <i class="fas fa-shopping-bag"></i>
+              <div>
+                <span id="totalComprasClientes">0</span>
+                <small>Total Compras</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nombre</th>
+                  <th>Teléfono</th>
+                  <th>Correo</th>
+                  <th>Total Compras</th>
+                  <th>Última Visita</th>
+                  <th>Tipo</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="clientesBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== REPORTES ===== -->
+        <section id="page-reportes" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-chart-bar"></i> Reportes</h2>
+            <div class="page-actions">
+              <select id="reporteTipo" onchange="generarReporte()" class="select-styled">
+                <option value="diario">Reporte Diario</option>
+                <option value="semanal" selected>Reporte Semanal</option>
+                <option value="mensual">Reporte Mensual</option>
+                <option value="anual">Reporte Anual</option>
+              </select>
+              <button class="btn-primary" onclick="exportarReporte()">
+                <i class="fas fa-download"></i> Exportar
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" id="reporteStats"></div>
+
+          <div class="dashboard-grid">
+            <div class="dash-card chart-card">
+              <div class="card-header">
+                <h3><i class="fas fa-chart-line"></i> Ventas por Período</h3>
+              </div>
+              <canvas id="reporteChart" width="500" height="220"></canvas>
+            </div>
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-trophy"></i> Top Productos</h3>
+              </div>
+              <div id="topProductosList"></div>
+            </div>
+          </div>
+
+          <div class="dash-card mt-20">
+            <div class="card-header">
+              <h3><i class="fas fa-table"></i> Detalle de Ventas</h3>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th># Factura</th>
+                  <th>Cliente</th>
+                  <th>Cajero</th>
+                  <th>Productos</th>
+                  <th>Total</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="reporteVentasTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== USUARIOS ===== -->
+        <section id="page-usuarios" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-user-cog"></i> Gestión de Usuarios</h2>
+            <div class="page-actions">
+              <button class="btn-primary" onclick="abrirModalUsuario()">
+                <i class="fas fa-user-plus"></i> Crear Usuario
+              </button>
+            </div>
+          </div>
+
+          <div class="usuarios-grid" id="usuariosGrid"></div>
+
+          <div class="dash-card mt-20">
+            <div class="card-header">
+              <h3><i class="fas fa-shield-alt"></i> Historial de Accesos</h3>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Rol</th>
+                  <th>Acción</th>
+                  <th>Módulo</th>
+                  <th>Fecha y Hora</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="historialAccesosTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== CONFIGURACIÓN ===== -->
+        <section id="page-configuracion" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
+          </div>
+          <div class="config-grid">
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-palette"></i> Apariencia</h3>
+              </div>
+              <div class="config-section">
+                <div class="config-item">
+                  <div>
+                    <b>Modo Oscuro</b>
+                    <small>Cambiar entre tema claro y oscuro</small>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="config-item">
+                  <div>
+                    <b>Color Principal</b>
+                    <small>Color del tema del sistema</small>
+                  </div>
+                  <div class="color-options">
+                    <button class="color-btn active" style="background:#27ae60" onclick="setThemeColor('#27ae60', this)"></button>
+                    <button class="color-btn" style="background:#e67e22" onclick="setThemeColor('#e67e22', this)"></button>
+                    <button class="color-btn" style="background:#2980b9" onclick="setThemeColor('#2980b9', this)"></button>
+                    <button class="color-btn" style="background:#8e44ad" onclick="setThemeColor('#8e44ad', this)"></button>
+                    <button class="color-btn" style="background:#c0392b" onclick="setThemeColor('#c0392b', this)"></button>
+                  </div>
+                </div>
+                <div class="config-item">
+                  <div>
+                    <b>Tamaño de Fuente</b>
+                    <small>Ajustar el tamaño del texto</small>
+                  </div>
+                  <select class="select-styled" onchange="setFontSize(this.value)">
+                    <option value="14">Pequeño (14px)</option>
+                    <option value="16" selected>Normal (16px)</option>
+                    <option value="18">Grande (18px)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-store"></i> Datos del Negocio</h3>
+              </div>
+              <div class="config-section">
+                <div class="form-group">
+                  <label>Nombre del Negocio</label>
+                  <input type="text" value="Chily Frutas" class="input-styled" />
+                </div>
+                <div class="form-group">
+                  <label>Dirección</label>
+                  <input type="text" value="Managua, Nicaragua" class="input-styled" />
+                </div>
+                <div class="form-group">
+                  <label>Teléfono</label>
+                  <input type="text" value="+505 8888-9999" class="input-styled" />
+                </div>
+                <div class="form-group">
+                  <label>Correo</label>
+                  <input type="email" value="info@chilyfrutas.com" class="input-styled" />
+                </div>
+                <div class="form-group">
+                  <label>Moneda</label>
+                  <select class="select-styled">
+                    <option>Córdobas (C$)</option>
+                    <option>Dólares (US$)</option>
+                  </select>
+                </div>
+                <button class="btn-primary" onclick="showToast('Configuración guardada', 'success')">
+                  <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-print"></i> Configuración de Impresión</h3>
+              </div>
+              <div class="config-section">
+                <div class="config-item">
+                  <div>
+                    <b>Imprimir automáticamente</b>
+                    <small>Al finalizar cada venta</small>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="config-item">
+                  <div>
+                    <b>Mostrar logo en factura</b>
+                    <small>Incluir logo del negocio</small>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="form-group mt-10">
+                  <label>Pie de página de factura</label>
+                  <input type="text" value="¡Gracias por su compra! Vuelva pronto." class="input-styled" />
+                </div>
+                <button class="btn-primary" onclick="showToast('Configuración de impresión guardada', 'success')">
+                  <i class="fas fa-save"></i> Guardar
+                </button>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-database"></i> Datos del Sistema</h3>
+              </div>
+              <div class="config-section">
+                <button class="btn-outline mb-10" onclick="showToast('Datos exportados correctamente', 'success')">
+                  <i class="fas fa-download"></i> Exportar Datos
+                </button>
+                <button class="btn-outline mb-10" onclick="showToast('Datos importados correctamente', 'success')">
+                  <i class="fas fa-upload"></i> Importar Datos
+                </button>
+                <button class="btn-danger" onclick="confirmarReset()">
+                  <i class="fas fa-trash-alt"></i> Restablecer Sistema
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== AYUDA ===== -->
+        <section id="page-ayuda" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-question-circle"></i> Centro de Ayuda</h2>
+          </div>
+          <div class="ayuda-grid">
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-book"></i> Manual de Usuario</h3>
+              </div>
+              <div class="manual-list">
+                <div class="manual-item">
+                  <div class="manual-icon green"><i class="fas fa-sign-in-alt"></i></div>
+                  <div>
+                    <b>Iniciar Sesión</b>
+                    <p>Ingrese su usuario y contraseña en la pantalla de acceso. El sistema tiene dos roles: Administrador y Cajero.</p>
+                  </div>
+                </div>
+                <div class="manual-item">
+                  <div class="manual-icon orange"><i class="fas fa-shopping-cart"></i></div>
+                  <div>
+                    <b>Registrar una Venta</b>
+                    <p>Vaya a "Ventas", busque el producto, agrégalo al carrito, ingrese el monto recibido y finalice la venta.</p>
+                  </div>
+                </div>
+                <div class="manual-item">
+                  <div class="manual-icon blue"><i class="fas fa-boxes"></i></div>
+                  <div>
+                    <b>Gestionar Inventario</b>
+                    <p>En "Inventario" puede agregar, editar y eliminar productos. El sistema alertará cuando el stock sea bajo.</p>
+                  </div>
+                </div>
+                <div class="manual-item">
+                  <div class="manual-icon purple"><i class="fas fa-chart-bar"></i></div>
+                  <div>
+                    <b>Ver Reportes</b>
+                    <p>En "Reportes" puede generar informes diarios, semanales, mensuales y anuales de ventas y ganancias.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-question"></i> Preguntas Frecuentes</h3>
+              </div>
+              <div class="faq-list">
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-question">
+                    <span>¿Cómo registro una nueva venta?</span>
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                  <div class="faq-answer">
+                    Vaya al módulo de Ventas, busque el producto en el panel izquierdo, haga clic en "Agregar" y siga el proceso de cobro.
+                  </div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-question">
+                    <span>¿Cómo agrego un producto nuevo?</span>
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                  <div class="faq-answer">
+                    En el módulo de Inventario, haga clic en "Agregar Producto" y complete el formulario con los datos del producto.
+                  </div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-question">
+                    <span>¿Qué pasa cuando el stock está bajo?</span>
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                  <div class="faq-answer">
+                    El sistema mostrará alertas visuales en el inventario y en el panel de notificaciones indicando qué productos necesitan reabastecimiento.
+                  </div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-question">
+                    <span>¿Cómo genero una factura?</span>
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                  <div class="faq-answer">
+                    Después de agregar productos al carrito, haga clic en "Generar Factura" o finalice la venta y el sistema generará la factura automáticamente.
+                  </div>
+                </div>
+                <div class="faq-item" onclick="toggleFaq(this)">
+                  <div class="faq-question">
+                    <span>¿Puedo cambiar el tema del sistema?</span>
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                  <div class="faq-answer">
+                    Sí, en Configuración puede activar el modo oscuro y cambiar el color principal del sistema.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-headset"></i> Soporte Técnico</h3>
+              </div>
+              <div class="soporte-info">
+                <div class="soporte-item">
+                  <div class="soporte-icon"><i class="fas fa-envelope"></i></div>
+                  <div>
+                    <b>Correo Electrónico</b>
+                    <span>soporte@chilyfrutas.com</span>
+                  </div>
+                </div>
+                <div class="soporte-item">
+                  <div class="soporte-icon"><i class="fas fa-phone"></i></div>
+                  <div>
+                    <b>Teléfono</b>
+                    <span>+505 2222-3333</span>
+                  </div>
+                </div>
+                <div class="soporte-item">
+                  <div class="soporte-icon"><i class="fas fa-clock"></i></div>
+                  <div>
+                    <b>Horario de Atención</b>
+                    <span>Lunes a Viernes, 8:00 AM - 5:00 PM</span>
+                  </div>
+                </div>
+                <div class="soporte-item">
+                  <div class="soporte-icon"><i class="fas fa-map-marker-alt"></i></div>
+                  <div>
+                    <b>Ubicación</b>
+                    <span>Managua, Nicaragua</span>
+                  </div>
+                </div>
+                <div class="form-group mt-20">
+                  <label>Enviar mensaje</label>
+                  <textarea class="input-styled" rows="3" placeholder="Describa su problema..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="showToast('Mensaje enviado al soporte', 'success')">
+                  <i class="fas fa-paper-plane"></i> Enviar Mensaje
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== ACERCA DEL SISTEMA ===== -->
+        <section id="page-acerca" class="page">
+          <div class="page-header">
+            <h2><i class="fas fa-info-circle"></i> Acerca del Sistema</h2>
+          </div>
+          <div class="acerca-layout">
+            <div class="dash-card acerca-main">
+              <div class="acerca-logo">
+                <div class="logo-big">
+                  <i class="fas fa-leaf"></i>
+                  <i class="fas fa-pepper-hot"></i>
+                </div>
+                <h2>Chily Frutas</h2>
+                <span class="version-badge">Versión 1.0.0</span>
+                <p>Sistema Administrativo Integral para el control de ventas, inventario, ingredientes y reportes del negocio Chily Frutas.</p>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-bullseye"></i> Objetivo del Sistema</h3>
+              </div>
+              <div class="acerca-content">
+                <p>El Sistema Administrativo de Chily Frutas fue desarrollado con el objetivo de digitalizar y optimizar los procesos operativos del negocio, eliminando el registro manual y proporcionando herramientas modernas para la toma de decisiones.</p>
+                <ul class="feature-list">
+                  <li><i class="fas fa-check"></i> Control de ventas en tiempo real</li>
+                  <li><i class="fas fa-check"></i> Gestión de inventario automatizada</li>
+                  <li><i class="fas fa-check"></i> Control de ingredientes y recetas</li>
+                  <li><i class="fas fa-check"></i> Generación de facturas profesionales</li>
+                  <li><i class="fas fa-check"></i> Reportes estadísticos detallados</li>
+                  <li><i class="fas fa-check"></i> Administración de usuarios con roles</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-graduation-cap"></i> Información Académica</h3>
+              </div>
+              <div class="acerca-content">
+                <div class="info-row"><b>Institución:</b> <span>Universidad Nacional Autónoma de Nicaragua</span></div>
+                <div class="info-row"><b>Carrera:</b> <span>Ingeniería en Sistemas de Información</span></div>
+                <div class="info-row"><b>Asignatura:</b> <span>Programación Web</span></div>
+                <div class="info-row"><b>Año:</b> <span>2025</span></div>
+                <div class="info-row"><b>Semestre:</b> <span>II Semestre</span></div>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-users"></i> Integrantes del Equipo</h3>
+              </div>
+              <div class="integrantes-list">
+                <div class="integrante-card">
+                  <div class="integrante-avatar" style="background:#27ae60">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <b>Integrante 1</b>
+                    <small>Desarrollador Frontend</small>
+                  </div>
+                </div>
+                <div class="integrante-card">
+                  <div class="integrante-avatar" style="background:#e67e22">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <b>Integrante 2</b>
+                    <small>Desarrollador Backend</small>
+                  </div>
+                </div>
+                <div class="integrante-card">
+                  <div class="integrante-avatar" style="background:#2980b9">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <b>Integrante 3</b>
+                    <small>Diseñador UX/UI</small>
+                  </div>
+                </div>
+                <div class="integrante-card">
+                  <div class="integrante-avatar" style="background:#8e44ad">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <b>Integrante 4</b>
+                    <small>Analista de Sistemas</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="card-header">
+                <h3><i class="fas fa-code"></i> Tecnologías Utilizadas</h3>
+              </div>
+              <div class="tech-grid">
+                <div class="tech-item"><i class="fab fa-html5"></i><span>HTML5</span></div>
+                <div class="tech-item"><i class="fab fa-css3-alt"></i><span>CSS3</span></div>
+                <div class="tech-item"><i class="fab fa-js-square"></i><span>JavaScript</span></div>
+                <div class="tech-item"><i class="fas fa-chart-line"></i><span>Canvas API</span></div>
+                <div class="tech-item"><i class="fab fa-font-awesome"></i><span>Font Awesome</span></div>
+                <div class="tech-item"><i class="fab fa-github"></i><span>GitHub Pages</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /pages-container -->
+    </div><!-- /main-content -->
+  </div><!-- /appScreen -->
+
+  <!-- ===== MODALES ===== -->
+
+  <!-- Modal Producto Detalle (Menú) -->
+  <div id="modalProductoDetalle" class="modal-overlay hidden">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="modalProductoNombre">Detalle del Producto</h3>
+        <button class="modal-close" onclick="cerrarModal('modalProductoDetalle')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="producto-detalle-layout">
+          <div class="producto-detalle-img">
+            <div id="modalProductoEmoji" class="producto-emoji-big">🍓</div>
+          </div>
+          <div class="producto-detalle-info">
+            <div class="detalle-badge" id="modalProductoCategoria">Batido</div>
+            <h2 id="modalProductoNombreH2"></h2>
+            <p id="modalProductoDescripcion"></p>
+            <div class="detalle-precio">
+              <span>Precio:</span>
+              <strong id="modalProductoPrecio"></strong>
+            </div>
+            <div class="detalle-estado" id="modalProductoEstado"></div>
+            <div class="detalle-ingredientes">
+              <h4><i class="fas fa-seedling"></i> Ingredientes:</h4>
+              <ul id="modalProductoIngredientes"></ul>
+            </div>
+            <div class="modal-actions">
+              <button class="btn-primary" id="modalAddCarrito" onclick="addFromModal()">
+                <i class="fas fa-cart-plus"></i> Agregar a Venta
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Inventario -->
+  <div id="modalInventario" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalInventarioTitle">Agregar Producto</h3>
+        <button class="modal-close" onclick="cerrarModal('modalInventario')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="invEditId" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre del Producto *</label>
+            <input type="text" id="invNombre" class="input-styled" placeholder="Nombre del producto" />
+          </div>
+          <div class="form-group">
+            <label>Categoría *</label>
+            <select id="invCategoria" class="select-styled">
+              <option value="Batido">Batido</option>
+              <option value="Ensalada">Ensalada de Frutas</option>
+              <option value="Fresco">Fresco Natural</option>
+              <option value="Postre">Postre</option>
+              <option value="Fruta">Fruta Preparada</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Precio (C$) *</label>
+            <input type="number" id="invPrecio" class="input-styled" placeholder="0.00" min="0" step="0.50" />
+          </div>
+          <div class="form-group">
+            <label>Cantidad en Stock *</label>
+            <input type="number" id="invCantidad" class="input-styled" placeholder="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <input type="text" id="invDescripcion" class="input-styled" placeholder="Descripción breve" />
+          </div>
+          <div class="form-group">
+            <label>Emoji del Producto</label>
+            <input type="text" id="invEmoji" class="input-styled" placeholder="🍓" maxlength="4" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="cerrarModal('modalInventario')">Cancelar</button>
+        <button class="btn-primary" onclick="guardarInventario()">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Ingrediente -->
+  <div id="modalIngrediente" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalIngredienteTitle">Agregar Ingrediente</h3>
+        <button class="modal-close" onclick="cerrarModal('modalIngrediente')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="ingEditId" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre del Ingrediente *</label>
+            <input type="text" id="ingNombre" class="input-styled" placeholder="Nombre" />
+          </div>
+          <div class="form-group">
+            <label>Unidad de Medida *</label>
+            <select id="ingUnidad" class="select-styled">
+              <option value="kg">Kilogramos (kg)</option>
+              <option value="g">Gramos (g)</option>
+              <option value="L">Litros (L)</option>
+              <option value="ml">Mililitros (ml)</option>
+              <option value="unidad">Unidades</option>
+              <option value="bolsa">Bolsas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Stock Actual *</label>
+            <input type="number" id="ingStock" class="input-styled" placeholder="0" min="0" step="0.1" />
+          </div>
+          <div class="form-group">
+            <label>Stock Mínimo *</label>
+            <input type="number" id="ingMinimo" class="input-styled" placeholder="0" min="0" step="0.1" />
+          </div>
+          <div class="form-group">
+            <label>Costo por Unidad (C$)</label>
+            <input type="number" id="ingCosto" class="input-styled" placeholder="0.00" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Emoji</label>
+            <input type="text" id="ingEmoji" class="input-styled" placeholder="🍓" maxlength="4" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="cerrarModal('modalIngrediente')">Cancelar</button>
+        <button class="btn-primary" onclick="guardarIngrediente()">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Cliente -->
+  <div id="modalCliente" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalClienteTitle">Agregar Cliente</h3>
+        <button class="modal-close" onclick="cerrarModal('modalCliente')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="cliEditId" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre Completo *</label>
+            <input type="text" id="cliNombre" class="input-styled" placeholder="Nombre del cliente" />
+          </div>
+          <div class="form-group">
+            <label>Teléfono *</label>
+            <input type="tel" id="cliTelefono" class="input-styled" placeholder="+505 8888-9999" />
+          </div>
+          <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" id="cliCorreo" class="input-styled" placeholder="correo@ejemplo.com" />
+          </div>
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" id="cliDireccion" class="input-styled" placeholder="Dirección del cliente" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="cerrarModal('modalCliente')">Cancelar</button>
+        <button class="btn-primary" onclick="guardarCliente()">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Usuario -->
+  <div id="modalUsuario" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalUsuarioTitle">Crear Usuario</h3>
+        <button class="modal-close" onclick="cerrarModal('modalUsuario')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="usrEditId" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre Completo *</label>
+            <input type="text" id="usrNombre" class="input-styled" placeholder="Nombre completo" />
+          </div>
+          <div class="form-group">
+            <label>Usuario *</label>
+            <input type="text" id="usrUsername" class="input-styled" placeholder="Nombre de usuario" />
+          </div>
+          <div class="form-group">
+            <label>Contraseña *</label>
+            <input type="password" id="usrPassword" class="input-styled" placeholder="Contraseña" />
+          </div>
+          <div class="form-group">
+            <label>Rol *</label>
+            <select id="usrRol" class="select-styled">
+              <option value="admin">Administrador</option>
+              <option value="cajero">Cajero</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Correo</label>
+            <input type="email" id="usrCorreo" class="input-styled" placeholder="correo@ejemplo.com" />
+          </div>
+          <div class="form-group">
+            <label>Estado</label>
+            <select id="usrEstado" class="select-styled">
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="cerrarModal('modalUsuario')">Cancelar</button>
+        <button class="btn-primary" onclick="guardarUsuario()">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Factura -->
+  <div id="modalFactura" class="modal-overlay hidden">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3><i class="fas fa-file-invoice"></i> Factura de Venta</h3>
+        <div class="modal-header-actions">
+          <button class="btn-sm btn-primary" onclick="imprimirFactura()">
+            <i class="fas fa-print"></i> Imprimir
+          </button>
+          <button class="modal-close" onclick="cerrarModal('modalFactura')"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="factura" id="facturaContent">
+          <div class="factura-header">
+            <div class="factura-logo">
+              <div class="factura-logo-icon">🌿🌶️</div>
+              <div>
+                <h2>Chily Frutas</h2>
+                <p>Managua, Nicaragua</p>
+                <p>Tel: +505 8888-9999</p>
+              </div>
+            </div>
+            <div class="factura-info">
+              <div class="factura-num">FACTURA</div>
+              <div class="factura-detail">
+                <span># <strong id="facturaNumero">0001</strong></span>
+                <span>Fecha: <strong id="facturaFecha"></strong></span>
+                <span>Hora: <strong id="facturaHora"></strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="factura-datos">
+            <div>
+              <p><b>Cliente:</b> <span id="facturaCliente">Consumidor Final</span></p>
+              <p><b>Cajero:</b> <span id="facturaCajero">Admin</span></p>
+            </div>
+          </div>
+          <table class="factura-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Producto</th>
+                <th>Cant.</th>
+                <th>Precio Unit.</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody id="facturaItems"></tbody>
+          </table>
+          <div class="factura-totals">
+            <div class="factura-total-row">
+              <span>Subtotal:</span>
+              <span id="facturaSubtotal">C$ 0.00</span>
+            </div>
+            <div class="factura-total-row total-bold">
+              <span>TOTAL:</span>
+              <span id="facturaTotal">C$ 0.00</span>
+            </div>
+            <div class="factura-total-row">
+              <span>Dinero Recibido:</span>
+              <span id="facturaRecibido">C$ 0.00</span>
+            </div>
+            <div class="factura-total-row cambio-row">
+              <span>Cambio:</span>
+              <span id="facturaCambio">C$ 0.00</span>
+            </div>
+          </div>
+          <div class="factura-footer">
+            <p>¡Gracias por su compra! Vuelva pronto.</p>
+            <p class="factura-small">Sistema Administrativo Chily Frutas v1.0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Eliminar -->
+  <div id="modalConfirmar" class="modal-overlay hidden">
+    <div class="modal modal-sm">
+      <div class="modal-header danger">
+        <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+        <button class="modal-close" onclick="cerrarModal('modalConfirmar')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="confirm-icon"><i class="fas fa-trash-alt"></i></div>
+        <p id="confirmarMsg">¿Está seguro que desea eliminar este registro?</p>
+        <p class="confirm-warn">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="cerrarModal('modalConfirmar')">Cancelar</button>
+        <button class="btn-danger" id="confirmarBtn" onclick="">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Historial Cliente -->
+  <div id="modalHistorialCliente" class="modal-overlay hidden">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="modalHistorialTitle"><i class="fas fa-history"></i> Historial de Compras</h3>
+        <button class="modal-close" onclick="cerrarModal('modalHistorialCliente')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th># Factura</th>
+              <th>Productos</th>
+              <th>Total</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="historialClienteBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
